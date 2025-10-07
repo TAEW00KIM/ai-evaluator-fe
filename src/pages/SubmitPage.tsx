@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../api";
 import { User } from "../types";
+import { useAuth } from "../context/AuthContext";
 
 function SubmitPage() {
+  const user = useAuth;
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [assignmentId, setAssignmentId] = useState("1"); // 예시 과제 ID
@@ -51,7 +53,7 @@ function SubmitPage() {
 
   return (
     <div>
-      <h2>{currentUser.name}님, 안녕하세요!</h2>
+      <h2>{user.name}님, 안녕하세요!</h2>
       <h1>과제 제출</h1>
       <form onSubmit={handleSubmit}>
         <div>

@@ -6,15 +6,33 @@ function StatusPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // 컴포넌트가 로드될 때 내 제출 목록을 가져옴
+  const fetchSubmissions = () => {
     apiClient
       .get("/api/submissions/me")
       .then((response) => {
         setSubmissions(response.data.data);
-        setIsLoading(false);
       })
-      .catch(() => (window.location.href = "/login")); // 실패 시 로그인 페이지로
+      .catch(() => (window.location.href = "/login"))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    fetchSubmissions(); // 처음 한 번 데이터를 불러옴
+
+    // 5초마다 Polling을 위한 인터벌 설정
+    const intervalId = setInterval(() => {
+      // '채점 중'인 항목이 있을 때만 데이터를 다시 불러옴
+      setSubmissions((prev) => {
+        const isPending = prev.some(
+          (s) => s.status === "PENDING" || s.status === "RUNNING"
+        );
+        if (isPending) {
+          fetchSubmissions();
+        }
+        return prev;
+      });
+    }, 5000); // 5000ms = 5초
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
