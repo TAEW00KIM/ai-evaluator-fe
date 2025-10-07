@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Link,
+  useLocation,
+} from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import SubmitPage from "./pages/SubmitPage";
+import StatusPage from "./pages/StatusPage";
+import "./App.css";
+
+// 로그인 페이지가 아닐 때만 헤더를 보여주는 컴포넌트
+const Header = () => {
+  const location = useLocation();
+  if (location.pathname === "/login") {
+    return null;
+  }
+  return (
+    <header>
+      <nav>
+        <Link to="/">과제 제출</Link>
+        <Link to="/submissions">제출 현황</Link>
+      </nav>
+    </header>
+  );
+};
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <Header />
+      <main>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<SubmitPage />} />
+          <Route path="/submissions" element={<StatusPage />} />
+        </Routes>
+      </main>
+    </Router>
+  );
 }
 
-export default App
+export default App;
