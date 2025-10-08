@@ -43,30 +43,32 @@ function AdminPage() {
   return (
     <div>
       <h1>관리자 대시보드 (전체 제출 현황)</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>제출 ID</th>
-            <th>학생 이름</th>
-            <th>학생 이메일</th>
-            <th>제출 시간</th>
-            <th>상태</th>
-            <th>점수</th>
-          </tr>
-        </thead>
-        <tbody>
-          {submissions.map((sub) => (
-            <tr key={sub.id}>
-              <td>{sub.id}</td>
-              <td>{sub.studentName}</td>
-              <td>{sub.studentEmail}</td>
-              <td>{new Date(sub.submissionTime).toLocaleString()}</td>
-              <td>{sub.status}</td>
-              <td>{sub.score ?? "N/A"}</td>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>제출 ID</th>
+              <th>학생 이름</th>
+              <th>학생 이메일</th>
+              <th>제출 시간</th>
+              <th>상태</th>
+              <th>점수</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {submissions.map((sub) => (
+              <tr key={sub.id}>
+                <td>{sub.id}</td>
+                <td>{sub.studentName}</td>
+                <td>{sub.studentEmail}</td>
+                <td>{new Date(sub.submissionTime).toLocaleString()}</td>
+                <td>{sub.status}</td>
+                <td>{sub.score ?? "N/A"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

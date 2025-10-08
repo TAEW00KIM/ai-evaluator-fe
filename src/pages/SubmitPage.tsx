@@ -1,22 +1,31 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../api";
-import { User } from "../types";
 import { useAuth } from "../context/AuthContext";
+import { Assignment } from "../types";
 
 function SubmitPage() {
-  const user = useAuth;
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
-  const [assignmentId, setAssignmentId] = useState("1"); // 예시 과제 ID
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [assignmentId, setAssignmentId] = useState("");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    // 컴포넌트가 로드될 때 로그인한 사용자 정보를 가져옴
-    apiClient
-      .get("/api/user/me")
-      .then((response) => setCurrentUser(response.data.data))
-      .catch(() => (window.location.href = "/login")); // 실패 시 로그인 페이지로
-  }, []);
+    if (user) {
+      apiClient
+        .get("/api/assignments")
+        .then((response) => {
+          const fetchedAssignments: Assignment[] = response.data.data;
+          setAssignments(fetchedAssignments);
+          if (fetchedAssignments.length > 0) {
+            setAssignmentId(String(fetchedAssignments[0].id));
+          }
+        })
+        .catch((error) => {
+          console.error("과제 목록을 불러오는 데 실패했습니다.", error);
+        });
+    }
+  }, [user]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -26,11 +35,14 @@ function SubmitPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !currentUser) return;
+    if (!file || !user || !assignmentId) {
+      setMessage("과제를 선택하고 파일을 첨부해주세요.");
+      return;
+    }
 
     setMessage("제출 중입니다...");
     const formData = new FormData();
-    formData.append("studentId", String(currentUser.id));
+    formData.append("studentId", String(user.id));
     formData.append("assignmentId", assignmentId);
     formData.append("file", file);
 
@@ -47,7 +59,7 @@ function SubmitPage() {
     }
   };
 
-  if (!currentUser) {
+  if (!user) {
     return <div>Loading...</div>;
   }
 
@@ -57,27 +69,58 @@ function SubmitPage() {
       <h1>과제 제출</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>과제 선택: </label>
+          <label>과제 선택:</label>
           <select
             value={assignmentId}
             onChange={(e) => setAssignmentId(e.target.value)}
+            required
           >
-            <option value="1">과제 1: CNN 모델 구현</option>
-            {/* 나중에 과제 API 연동 */}
+            <option value="" disabled>
+              과제를 선택하세요
+            </option>
+            {assignments.map((assignment) => (
+              <option key={assignment.id} value={assignment.id}>
+                {assignment.title}
+              </option>
+            ))}
           </select>
         </div>
-        <br />
         <div>
-          <label>코드 파일 (zip): </label>
+          <label htmlFor="file-upload">코드 파일 (zip)</label>
+          <label htmlFor="file-upload" className="custom-file-upload">
+            <svg
+              className="icon"
+              viewBox="0 0 24 24"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            파일 선택
+          </label>
           <input
+            id="file-upload" // label과 연결
             type="file"
             accept=".zip"
             onChange={handleFileChange}
             required
           />
+          {file && <span className="file-name">{file.name}</span>}
         </div>
-        <br />
-        <button type="submit">제출하기</button>
+        <button type="submit" className="accent">
+          <svg
+            className="icon"
+            viewBox="0 0 24 24"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+          제출하기
+        </button>
       </form>
       {message && <p>{message}</p>}
     </div>

@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Axios 인스턴스 생성
 const apiClient = axios.create({
-  // Vite 프록시 설정이 있으므로 baseURL은 필요 없음
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 // 모든 요청에 세션 쿠키를 포함하도록 설정

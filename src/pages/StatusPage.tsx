@@ -41,26 +41,32 @@ function StatusPage() {
       {isLoading ? (
         <p>데이터를 불러오는 중입니다...</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>제출 ID</th>
-              <th>제출 시간</th>
-              <th>상태</th>
-              <th>점수</th>
-            </tr>
-          </thead>
-          <tbody>
-            {submissions.map((sub) => (
-              <tr key={sub.id}>
-                <td>{sub.id}</td>
-                <td>{new Date(sub.submissionTime).toLocaleString()}</td>
-                <td>{sub.status}</td>
-                <td>{sub.score ?? "N/A"}</td>
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>제출 ID</th>
+                <th>제출 시간</th>
+                <th>상태</th>
+                <th>점수</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {submissions.map((sub) => (
+                <tr key={sub.id}>
+                  <td>{sub.id}</td>
+                  <td>{new Date(sub.submissionTime).toLocaleString()}</td>
+                  <td>
+                    <span className={`status status-${sub.status}`}>
+                      {sub.status}
+                    </span>
+                  </td>
+                  <td>{sub.score ?? "N/A"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

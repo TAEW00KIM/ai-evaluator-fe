@@ -14,3 +14,10 @@ export interface Submission {
   score: number | null;
   log: string | null;
 }
+
+export interface Assignment {
+  id: number;
+  title: string;
+  description: string;
+  createdAt: string;
+}
