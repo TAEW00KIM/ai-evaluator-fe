@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import apiClient from "../api";
-import { Submission } from "../types";
+import type { Submission } from "../types";
 
 function StatusPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);

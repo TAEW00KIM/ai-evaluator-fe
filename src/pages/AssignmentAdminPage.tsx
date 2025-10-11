@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../api";
-import { Assignment } from "../types";
+import type { Assignment } from "../types";
 
 function AssignmentAdminPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);

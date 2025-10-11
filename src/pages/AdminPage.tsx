@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import apiClient from "../api";
-import { Submission, User } from "../types"; // User 타입을 사용하진 않지만, 확장성을 위해 DTO에 포함될 수 있음
+import type { Submission } from "../types"; // User 타입을 사용하진 않지만, 확장성을 위해 DTO에 포함될 수 있음
 
 // 백엔드의 AdminSubmissionDto와 형식을 맞춥니다.
 interface AdminSubmission extends Submission {

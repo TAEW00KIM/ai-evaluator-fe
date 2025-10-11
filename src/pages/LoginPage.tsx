@@ -1,5 +1,3 @@
-import React from "react";
-
 function LoginPage() {
   const handleLogin = () => {
     window.location.href = "/oauth2/authorization/google";

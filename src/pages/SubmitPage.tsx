@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../api";
 import { useAuth } from "../context/AuthContext";
-import { Assignment } from "../types";
+import type { Assignment } from "../types";
 
 function SubmitPage() {
   const { user } = useAuth();

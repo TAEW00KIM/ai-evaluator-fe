@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Link,
   NavLink,
   useLocation,
   Outlet,
@@ -14,7 +13,7 @@ import StatusPage from "./pages/StatusPage";
 import "./App.css";
 import AdminPage from "./pages/AdminPage";
 import AssignmentAdminPage from "./pages/AssignmentAdminPage";
-import { useAuth } from "./context/AuthContext";
+import { useAuth, AuthGate } from "./context/AuthContext";
 
 // 1. Header 컴포넌트: 새로운 CSS 클래스 구조 적용
 const Header = () => {
@@ -110,21 +109,23 @@ function App() {
     <Router>
       <Header />
       <main>
-        <Routes>
-          {/* 레이아웃이 없는 페이지 */}
-          <Route path="/login" element={<LoginPage />} />
+        <AuthGate>
+          <Routes>
+            {/* 레이아웃이 없는 페이지 */}
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* 공통 레이아웃을 사용하는 페이지 그룹 */}
-          <Route element={<PageLayout />}>
-            <Route path="/" element={<SubmitPage />} />
-            <Route path="/submissions" element={<StatusPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route
-              path="/admin/assignments"
-              element={<AssignmentAdminPage />}
-            />
-          </Route>
-        </Routes>
+            {/* 공통 레이아웃을 사용하는 페이지 그룹 */}
+            <Route element={<PageLayout />}>
+              <Route path="/" element={<SubmitPage />} />
+              <Route path="/submissions" element={<StatusPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route
+                path="/admin/assignments"
+                element={<AssignmentAdminPage />}
+              />
+            </Route>
+          </Routes>
+        </AuthGate>
       </main>
     </Router>
   );
