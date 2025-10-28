@@ -14,7 +14,7 @@ import "./App.css";
 import AdminPage from "./pages/AdminPage";
 import AssignmentAdminPage from "./pages/AssignmentAdminPage";
 import { useAuth, AuthGate } from "./context/AuthContext";
-import LeaderboardPage from "./pages/LeaderBoardPage";
+import LeaderboardPage from "./pages/LeaderboardPage";
 
 // 1. Header 컴포넌트: 새로운 CSS 클래스 구조 적용
 const Header = () => {
@@ -58,7 +58,9 @@ const Header = () => {
               과제 제출
             </NavLink>
             <NavLink to="/submissions">제출 현황</NavLink>
-            <NavLink to="/leaderboard/1" onClick={closeMenu}>
+            <NavLink to="/leaderboard" onClick={closeMenu}>
+              {" "}
+              {/* 특정 ID 대신 기본 경로 사용 */}
               리더보드
             </NavLink>
             {user.role === "ADMIN" && (
@@ -127,8 +129,9 @@ function App() {
                 path="/admin/assignments"
                 element={<AssignmentAdminPage />}
               />
+              <Route path="/leaderboard" element={<LeaderboardPage />} />
               <Route
-                path="/leaderboard/:assignmentId"
+                path="/leaderboard/:assignmentId?"
                 element={<LeaderboardPage />}
               />
             </Route>

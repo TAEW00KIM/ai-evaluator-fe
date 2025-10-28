@@ -35,72 +35,77 @@ header {
 nav {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* ✅ 왼쪽(로고) / 오른쪽(메뉴) 균등 정렬 */
   max-width: 1200px;
   margin: 0 auto;
   height: 70px;
 }
 
+/* 사이트 제목 */
 .site-title {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-color);
   text-decoration: none;
-  position: relative;
-  z-index: 1001;
 }
 
-/* --- 데스크탑 메뉴 --- */
+/* --- 메뉴 영역 --- */
 .collapsible-menu {
   display: flex;
   align-items: center;
+  justify-content: flex-end; /* ✅ 오른쪽 정렬 */
   gap: 2rem;
-  margin-left: 300px;
+  flex: 1; /* ✅ 공간 유연 배분 */
+  margin-left: 0; /* ❌ 기존 300px 제거 */
 }
 
 .nav-links {
   display: flex;
-  gap: 2rem;
   align-items: center;
+  gap: 1.5rem;
 }
+
 .nav-links a {
   text-decoration: none;
   color: var(--text-color-secondary);
   font-weight: 500;
-  transition: color 0.2s;
+  transition: color 0.2s, border-bottom-color 0.2s;
   padding: 8px 4px;
   border-bottom: 2px solid transparent;
 }
+
 .nav-links a:hover,
 .nav-links a.active {
   color: var(--primary-color);
   border-bottom-color: var(--primary-color);
 }
 
+/* --- 사용자 정보 --- */
 .user-info {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
+
 .user-info .user-name {
   font-weight: 600;
   color: var(--text-color);
 }
+
 .user-info button {
-  padding: 0.5rem 1rem;
-} /* 데스크탑 로그아웃 버튼 크기 조정 */
+  padding: 0.4rem 1rem;
+}
 
 /* --- 모바일 햄버거 버튼 --- */
 .hamburger {
   display: none;
   background: none;
   border: none;
-  padding: 0;
   color: var(--text-color);
-  z-index: 1001;
-  margin-left: auto;
+  cursor: pointer;
 }
 
-/* 메뉴가 열렸을 때 뒷배경 어둡게 처리 + 스크롤 방지 */
+/* ✅ 메뉴가 열렸을 때 오버레이 처리 */
 .menu-overlay-open {
   position: fixed;
   top: 0;
@@ -275,26 +280,6 @@ tbody tr:hover {
 }
 
 @media (max-width: 768px) {
-  header {
-    padding: 0 1.5rem;
-  }
-
-  /* 🔽 사이트 제목 폰트 크기를 모바일에서 살짝 줄여 공간 확보 */
-  .site-title {
-    font-size: 1.25rem;
-  }
-
-  .hamburger {
-    display: block;
-    position: relative;
-    z-index: 1001;
-  }
-
-  .nav-desktop {
-    display: none;
-  }
-
-  /* 메뉴 전체를 오른쪽에서 나오는 사이드바로 변경 */
   .collapsible-menu {
     position: fixed;
     top: 0;
@@ -303,13 +288,10 @@ tbody tr:hover {
     height: 100%;
     background-color: var(--surface-color);
     box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
-
     flex-direction: column;
-
-    justify-content: flex-start; /* ◀️ 메뉴 아이템들을 위에서부터 정렬 */
-    align-items: flex-start; /* ◀️ 메뉴 아이템들을 왼쪽으로 정렬 */
-    padding: 80px 2rem 2rem 2rem; /* ◀️ 상단 및 좌우 여백 추가 */
-
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 80px 2rem 2rem 2rem;
     transform: translateX(100%);
     transition: transform 0.3s ease-in-out;
     z-index: 1001;
@@ -319,31 +301,23 @@ tbody tr:hover {
     transform: translateX(0);
   }
 
-  /* 모바일 메뉴 내부 링크 스타일 */
   .collapsible-menu .nav-links {
     flex-direction: column;
-    gap: 1.5rem;
-    order: 1;
-    align-items: flex-start; /* ◀️ 링크들을 왼쪽으로 정렬 */
-  }
-  .collapsible-menu .nav-links a {
-    font-size: 1.2rem;
+    gap: 1.2rem;
+    align-items: flex-start;
   }
 
-  /* 모바일 메뉴 내부 사용자 정보 스타일 */
   .collapsible-menu .user-info {
     flex-direction: column;
-    gap: 1.5rem;
-    order: 2;
+    align-items: flex-start;
     margin-top: 2rem;
-    padding-top: 2rem;
+    padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
-    width: 100%; /* ◀️ 너비를 100%로 설정 */
-    align-items: flex-start; /* ◀️ 사용자 정보도 왼쪽으로 정렬 */
-    text-align: left;
+    width: 100%;
   }
 
-  .collapsible-menu .user-info .user-name {
-    font-size: 1rem;
+  .hamburger {
+    display: block;
+    margin-left: auto;
   }
 }
