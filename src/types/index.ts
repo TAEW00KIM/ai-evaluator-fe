@@ -21,3 +21,11 @@ export interface Assignment {
   description: string;
   createdAt: string;
 }
+
+export interface LeaderboardRow {
+  rank: number;
+  studentId: number;
+  studentName: string;
+  bestScore: number;
+  lastSubmittedAt: string; // ISO string
+}
