@@ -7,6 +7,15 @@ function AssignmentAdminPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [message, setMessage] = useState("");
+  const [scriptFile, setScriptFile] = useState<File | null>(null);
+
+  const handleScriptFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setScriptFile(e.target.files[0]);
+    } else {
+      setScriptFile(null);
+    }
+  };
 
   // 토글 핸들러
   async function toggleLeaderboard(id: number, nextHidden: boolean) {
@@ -224,13 +233,15 @@ function AssignmentAdminPage() {
       <form
         onSubmit={async (e) => {
           e.preventDefault();
-          const input = document.getElementById(
-            "gradingScript"
-          ) as HTMLInputElement;
-          if (!input?.files?.length)
+
+          // input.files[0] 대신 state 사용
+          if (!scriptFile) {
             return alert("업로드할 파일을 선택해주세요.");
+          }
+
           const formData = new FormData();
-          formData.append("file", input.files[0]);
+          formData.append("file", scriptFile);
+
           try {
             const res = await apiClient.post(
               "/api/admin/grading-script",
@@ -240,13 +251,48 @@ function AssignmentAdminPage() {
               }
             );
             alert("✅ " + res.data);
+            setScriptFile(null); // 성공 시 파일 선택 초기화
+            // DOM 직접 접근 대신, input의 value를 리셋하기 위해 key를 바꾸거나 폼을 리셋할 수 있지만,
+            // 간단하게 DOM을 직접 리셋합니다.
+            const input = document.getElementById(
+              "gradingScript"
+            ) as HTMLInputElement;
+            if (input) input.value = "";
           } catch (err: any) {
             alert("❌ 업로드 실패: " + (err.response?.data || err.message));
           }
         }}
       >
-        <input id="gradingScript" type="file" accept=".py" />
-        <button type="submit" style={{ marginLeft: "10px" }}>
+        {/* SubmitPage와 동일한 UI 패턴 적용 */}
+        <label htmlFor="gradingScript" className="custom-file-upload">
+          <svg
+            className="icon"
+            viewBox="0 0 24 24"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          채점 스크립트 (.py) 선택
+        </label>
+        <input
+          id="gradingScript"
+          type="file"
+          accept=".py"
+          onChange={handleScriptFileChange} // state 연결
+        />
+        {scriptFile && (
+          <span className="file-name" style={{ marginLeft: "1rem" }}>
+            {scriptFile.name}
+          </span>
+        )}
+
+        <button
+          type="submit"
+          style={{ marginLeft: "10px", marginTop: "1rem", display: "block" }} // 버튼을 다음 줄로 내림
+        >
           업로드
         </button>
       </form>
