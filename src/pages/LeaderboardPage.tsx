@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // useNavigate 추가
 import type { LeaderboardRow, Assignment } from "../types"; // Assignment 타입 임포트
 import apiClient from "../api"; // apiClient 임포트
+import { useAuth } from "../context/AuthContext";
 
 export default function LeaderboardPage() {
   const { assignmentId } = useParams<{ assignmentId: string }>();
@@ -13,6 +14,7 @@ export default function LeaderboardPage() {
   ); // 선택된 과제 ID 상태 추가
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   // 과제 목록 불러오기 useEffect
   useEffect(() => {
@@ -22,35 +24,41 @@ export default function LeaderboardPage() {
         const res = await apiClient.get("/api/assignments");
         if (!ignore) {
           const fetchedAssignments: Assignment[] = res.data.data;
-          setAssignments(fetchedAssignments);
-          // URL 파라미터가 없거나 유효하지 않으면 첫 번째 과제를 기본값으로 설정
+
+          const visibleAssignments =
+            user?.role === "ADMIN"
+              ? fetchedAssignments
+              : fetchedAssignments.filter((a) => !a.leaderboardHidden);
+
+          setAssignments(visibleAssignments);
+
+          // 기본 선택 로직
           if (
             (!assignmentId ||
-              !fetchedAssignments.some((a) => String(a.id) === assignmentId)) &&
-            fetchedAssignments.length > 0
+              !visibleAssignments.some((a) => String(a.id) === assignmentId)) &&
+            visibleAssignments.length > 0
           ) {
-            const defaultId = String(fetchedAssignments[0].id);
+            const defaultId = String(visibleAssignments[0].id);
             setSelectedAssignmentId(defaultId);
-            // URL도 기본값으로 변경 (선택사항)
             navigate(`/leaderboard/${defaultId}`, { replace: true });
           } else {
             setSelectedAssignmentId(
               assignmentId ||
-                (fetchedAssignments.length > 0
-                  ? String(fetchedAssignments[0].id)
+                (visibleAssignments.length > 0
+                  ? String(visibleAssignments[0].id)
                   : "")
             );
           }
         }
       } catch (e) {
-        if (!ignore) console.error("Failed to load assignments", e);
+        console.error("Failed to load assignments", e);
       }
     }
     fetchAssignments();
     return () => {
       ignore = true;
     };
-  }, []); // 컴포넌트 마운트 시 한 번만 실행
+  }, [user, assignmentId, navigate]);
 
   // 리더보드 데이터 불러오기 useEffect
   useEffect(() => {
@@ -72,7 +80,14 @@ export default function LeaderboardPage() {
         const data: LeaderboardRow[] = res.data; // 백엔드 API가 List<LeaderboardRowDto>를 바로 반환하므로 .data 사용
         if (!ignore) setRows(data);
       } catch (e: any) {
-        if (!ignore) setError(e?.message ?? "Failed to load leaderboard");
+        if (!ignore) {
+          const status = e?.response?.status;
+          if (status === 403) {
+            setError("해당 과제의 리더보드는 현재 열람이 제한되어 있습니다.");
+          } else {
+            setError(e?.message ?? "Failed to load leaderboard");
+          }
+        }
       } finally {
         if (!ignore) setLoading(false);
       }

@@ -13,6 +13,23 @@ function AssignmentAdminPage() {
     fetchAssignments();
   }, []);
 
+  // 토글 핸들러
+  async function toggleLeaderboard(id: number, nextHidden: boolean) {
+    try {
+      const res = await apiClient.patch(
+        `/api/admin/assignments/${id}/leaderboard`,
+        { hidden: nextHidden }
+      );
+      const updated = res.data; // 백엔드에서 AssignmentDto 반환 시
+      setAssignments((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, ...updated } : a))
+      );
+    } catch (e) {
+      console.error("리더보드 토글 실패", e);
+      alert("리더보드 상태 변경에 실패했습니다.");
+    }
+  }
+
   const fetchAssignments = () => {
     apiClient
       .get("/api/assignments")
@@ -122,6 +139,28 @@ function AssignmentAdminPage() {
                 <strong>{assignment.title}</strong> (ID: {assignment.id})
               </td>
               <td>
+                {/* 리더보드 숨김 토글 버튼 */}
+                <button
+                  onClick={() =>
+                    toggleLeaderboard(
+                      assignment.id,
+                      !assignment.leaderboardHidden
+                    )
+                  }
+                  style={{
+                    backgroundColor: assignment.leaderboardHidden
+                      ? "#777"
+                      : "#4CAF50",
+                    color: "white",
+                    marginRight: "10px",
+                  }}
+                >
+                  {assignment.leaderboardHidden
+                    ? "리더보드 열기"
+                    : "리더보드 닫기"}
+                </button>
+
+                {/* 기존 삭제 버튼 */}
                 <button
                   onClick={() => handleDelete(assignment.id)}
                   className="danger"

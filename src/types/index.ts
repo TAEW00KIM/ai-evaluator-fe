@@ -20,6 +20,7 @@ export interface Assignment {
   title: string;
   description: string;
   createdAt: string;
+  leaderboardHidden: boolean;
 }
 
 export interface LeaderboardRow {
