@@ -5,7 +5,7 @@ import apiClient from "../api"; // apiClient 임포트
 import { useAuth } from "../context/AuthContext";
 
 export default function LeaderboardPage() {
-  const { assignmentId } = useParams<{ assignmentId: string }>();
+  const { assignmentId } = useParams<{ assignmentId?: string }>();
   const navigate = useNavigate(); // useNavigate 훅 사용
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]); // 과제 목록 상태 추가
@@ -136,7 +136,15 @@ export default function LeaderboardPage() {
       {/* 로딩, 에러, 데이터 없음 처리 */}
       {loading && <div style={{ padding: 16 }}>불러오는 중…</div>}
       {error && (
-        <div style={{ padding: 16, color: "crimson" }}>오류: {error}</div>
+        <div style={{ padding: 16, color: "crimson" }}>
+          오류: {error}
+          {error.includes("열람이 제한") && (
+            <div style={{ marginTop: 8, color: "#555" }}>
+              다른 과제를 선택하시거나, 담당자에게 리더보드 공개 여부를
+              문의하세요.
+            </div>
+          )}
+        </div>
       )}
       {!loading && !error && !rows.length && selectedAssignmentId && (
         <div style={{ padding: 16 }}>데이터가 없습니다.</div>

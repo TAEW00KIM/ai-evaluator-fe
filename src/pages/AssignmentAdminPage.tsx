@@ -8,11 +8,6 @@ function AssignmentAdminPage() {
   const [description, setDescription] = useState("");
   const [message, setMessage] = useState("");
 
-  // 페이지 로딩 시 기존 과제 목록 불러오기
-  useEffect(() => {
-    fetchAssignments();
-  }, []);
-
   // 토글 핸들러
   async function toggleLeaderboard(id: number, nextHidden: boolean) {
     try {
@@ -30,6 +25,22 @@ function AssignmentAdminPage() {
     }
   }
 
+  async function toggleSubmissions(id: number, nextClosed: boolean) {
+    try {
+      const res = await apiClient.patch(
+        `/api/admin/assignments/${id}/submissions`,
+        { closed: nextClosed }
+      );
+      const updated = res.data; // 백엔드에서 AssignmentDto 반환 시
+      setAssignments((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, ...updated } : a))
+      );
+    } catch (e) {
+      console.error("제출 허용/마감 토글 실패", e);
+      alert("제출 상태 변경에 실패했습니다.");
+    }
+  }
+
   const fetchAssignments = () => {
     apiClient
       .get("/api/assignments")
@@ -40,6 +51,10 @@ function AssignmentAdminPage() {
         console.error("과제 목록 로딩 실패", error);
       });
   };
+
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,6 +144,8 @@ function AssignmentAdminPage() {
         <thead>
           <tr>
             <th>과제 제목</th>
+            <th>리더보드</th>
+            <th>제출 허용</th>
             <th>관리</th>
           </tr>
         </thead>
@@ -139,7 +156,6 @@ function AssignmentAdminPage() {
                 <strong>{assignment.title}</strong> (ID: {assignment.id})
               </td>
               <td>
-                {/* 리더보드 숨김 토글 버튼 */}
                 <button
                   onClick={() =>
                     toggleLeaderboard(
@@ -159,8 +175,27 @@ function AssignmentAdminPage() {
                     ? "리더보드 열기"
                     : "리더보드 닫기"}
                 </button>
-
-                {/* 기존 삭제 버튼 */}
+              </td>
+              <td>
+                <button
+                  onClick={() =>
+                    toggleSubmissions(
+                      assignment.id,
+                      !assignment.submissionsClosed
+                    )
+                  }
+                  style={{
+                    backgroundColor: assignment.submissionsClosed
+                      ? "#777"
+                      : "#4CAF50",
+                    color: "white",
+                    marginRight: "10px",
+                  }}
+                >
+                  {assignment.submissionsClosed ? "제출 열기" : "제출 닫기"}
+                </button>
+              </td>
+              <td>
                 <button
                   onClick={() => handleDelete(assignment.id)}
                   className="danger"
@@ -183,6 +218,38 @@ function AssignmentAdminPage() {
           ))}
         </tbody>
       </table>
+      <hr style={{ margin: "30px 0" }} />
+
+      <h2>채점 스크립트 업데이트</h2>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const input = document.getElementById(
+            "gradingScript"
+          ) as HTMLInputElement;
+          if (!input?.files?.length)
+            return alert("업로드할 파일을 선택해주세요.");
+          const formData = new FormData();
+          formData.append("file", input.files[0]);
+          try {
+            const res = await apiClient.post(
+              "/api/admin/grading-script",
+              formData,
+              {
+                headers: { "Content-Type": "multipart/form-data" },
+              }
+            );
+            alert("✅ " + res.data);
+          } catch (err: any) {
+            alert("❌ 업로드 실패: " + (err.response?.data || err.message));
+          }
+        }}
+      >
+        <input id="gradingScript" type="file" accept=".py" />
+        <button type="submit" style={{ marginLeft: "10px" }}>
+          업로드
+        </button>
+      </form>
     </div>
   );
 }

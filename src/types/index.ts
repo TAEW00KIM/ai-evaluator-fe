@@ -21,6 +21,7 @@ export interface Assignment {
   description: string;
   createdAt: string;
   leaderboardHidden: boolean;
+  submissionsClosed: boolean;
 }
 
 export interface LeaderboardRow {

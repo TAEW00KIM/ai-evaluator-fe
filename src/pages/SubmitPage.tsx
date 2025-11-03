@@ -9,6 +9,9 @@ function SubmitPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [assignmentId, setAssignmentId] = useState("");
   const [message, setMessage] = useState("");
+  // 현재 선택된 과제 및 마감 여부
+  const selected = assignments.find((a) => String(a.id) === assignmentId);
+  const closed = !!selected?.submissionsClosed;
 
   useEffect(() => {
     if (user) {
@@ -35,6 +38,10 @@ function SubmitPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (closed) {
+      setMessage("이 과제는 현재 제출이 마감되었습니다.");
+      return;
+    }
     if (!file || !user || !assignmentId) {
       setMessage("과제를 선택하고 파일을 첨부해주세요.");
       return;
@@ -67,6 +74,18 @@ function SubmitPage() {
     <div>
       <h2>{user.name}님, 안녕하세요!</h2>
       <h1>과제 제출</h1>
+      {closed && (
+        <div
+          style={{
+            padding: "12px",
+            marginBottom: "12px",
+            background: "#fff3cd",
+            border: "1px solid #ffeeba",
+          }}
+        >
+          이 과제는 현재 <b>제출 마감</b> 상태입니다. 관리자에게 문의하세요.
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div>
           <label>과제 선택:</label>
@@ -101,15 +120,21 @@ function SubmitPage() {
             파일 선택
           </label>
           <input
-            id="file-upload" // label과 연결
+            id="file-upload"
             type="file"
             accept=".zip"
             onChange={handleFileChange}
             required
+            disabled={closed}
           />
           {file && <span className="file-name">{file.name}</span>}
         </div>
-        <button type="submit" className="accent">
+        <button
+          type="submit"
+          className="accent"
+          disabled={closed}
+          title={closed ? "제출이 마감되었습니다" : "제출"}
+        >
           <svg
             className="icon"
             viewBox="0 0 24 24"
