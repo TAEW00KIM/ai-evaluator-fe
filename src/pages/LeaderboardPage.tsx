@@ -171,7 +171,7 @@ export default function LeaderboardPage() {
               <tr key={`${r.studentId}-${r.rank}`}>
                 <td style={td}>{r.rank}</td>
                 <td style={td}>{r.studentName}</td>
-                <td style={td}>{r.bestScore.toFixed(2)}</td>
+                <td style={td}>{r.bestScore.toFixed(10)}</td>
                 {/* 백엔드 DTO가 String으로 내려주므로 new Date() 사용 */}
                 <td style={td}>
                   {new Date(r.lastSubmittedAt).toLocaleString()}

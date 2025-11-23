@@ -31,8 +31,28 @@ function SubmitPage() {
   }, [user]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFile(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+
+      // 2번 프로젝트를 위한 파일명 검사
+      if (
+        selectedFile.name !== "z_best.pt" &&
+        selectedFile.name.endsWith(".pt")
+      ) {
+        setMessage(
+          "경고: 제출 파일명이 'z_best.pt'가 아닙니다. 2번 프로젝트 제출 시 파일명을 'z_best.pt'로 맞춰주세요."
+        );
+      } else if (
+        !selectedFile.name.endsWith(".pt") &&
+        !selectedFile.name.endsWith(".zip")
+      ) {
+        setMessage(
+          "경고: .zip 또는 .pt 파일만 제출할 수 있습니다. 과제 유형을 확인하세요."
+        );
+      } else {
+        setMessage(""); // 유효한 파일이거나 zip 파일이면 메시지 초기화
+      }
     }
   };
 
@@ -45,6 +65,17 @@ function SubmitPage() {
     if (!file || !user || !assignmentId) {
       setMessage("과제를 선택하고 파일을 첨부해주세요.");
       return;
+    }
+
+    // 2번 프로젝트(pt) 파일명 강제 검사
+    if (file.name.endsWith(".pt") && file.name !== "z_best.pt") {
+      if (
+        !window.confirm(
+          "파일 이름이 'z_best.pt'가 아닙니다. 그래도 제출하시겠습니까?"
+        )
+      ) {
+        return;
+      }
     }
 
     setMessage("제출 중입니다...");
@@ -105,7 +136,7 @@ function SubmitPage() {
           </select>
         </div>
         <div>
-          <label htmlFor="file-upload">코드 파일 (zip)</label>
+          <label htmlFor="file-upload">제출 파일 (.zip 또는 .pt)</label>
           <label htmlFor="file-upload" className="custom-file-upload">
             <svg
               className="icon"
@@ -117,12 +148,12 @@ function SubmitPage() {
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
-            파일 선택
+            파일 선택 (z_best.pt 또는 .zip)
           </label>
           <input
             id="file-upload"
             type="file"
-            accept=".zip"
+            accept=".zip,.pt"
             onChange={handleFileChange}
             required
             disabled={closed}
